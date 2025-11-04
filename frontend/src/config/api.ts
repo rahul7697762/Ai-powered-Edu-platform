@@ -1,0 +1,27 @@
+// API Configuration
+const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const VERCEL_API_URL = 'https://ai-edu-platform-backend.vercel.app';
+const LOCAL_API_URL = 'http://localhost:5000';
+
+export const API_BASE_URL = isDevelopment ? LOCAL_API_URL : VERCEL_API_URL;
+
+// Full API endpoints
+export const API_ENDPOINTS = {
+  // Resume Builder
+  RESUME_BUILDER: {
+    GENERATE_PDF: `${API_BASE_URL}/api/resume-builder/generate-pdf`,
+    HEALTH: `${API_BASE_URL}/api/resume-builder/health`,
+  },
+  
+  // ATS Analyzer
+  ATS_ANALYZER: {
+    PROCESS_RESUME: `${API_BASE_URL}/api/ats-analyzer/process-resume`,
+    ANALYZE_RESUME: `${API_BASE_URL}/api/ats-analyzer/analyze-resume`,
+    GENERATE_COVER_LETTER: `${API_BASE_URL}/api/ats-analyzer/generate-cover-letter`,
+    GENERATE_INTERVIEW_QUESTIONS: `${API_BASE_URL}/api/ats-analyzer/generate-interview-questions`,
+    REPHRASE_TEXT: `${API_BASE_URL}/api/ats-analyzer/rephrase-text`,
+    HEALTH: `${API_BASE_URL}/api/ats-analyzer/health`,
+  }
+};
+
+export default API_BASE_URL;

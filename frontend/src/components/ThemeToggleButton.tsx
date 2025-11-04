@@ -4,11 +4,17 @@ import { useTheme } from '../contexts/ThemeContext';
 const ThemeToggleButton: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
 
+  const handleToggle = () => {
+    console.log('Theme toggle clicked, current theme:', theme);
+    toggleTheme();
+  };
+
   return (
     <button
-      onClick={toggleTheme}
-      className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      onClick={handleToggle}
+      className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
       aria-label="Toggle dark mode"
+      title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
     >
       {theme === 'light' ? (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

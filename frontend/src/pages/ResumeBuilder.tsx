@@ -3,6 +3,7 @@ import ResumeForm from "./ResumeForm";
 import ResumePreview from "./ResumePreview";
 import TemplateSelection from "./TemplateSelection";
 import { useResume, ResumeData, ResumeTemplate } from "../contexts";
+import { API_ENDPOINTS } from "../config/api";
 
 const ResumeBuilder: React.FC = () => {
   const { resumeData, setResumeData } = useResume();
@@ -25,14 +26,20 @@ const ResumeBuilder: React.FC = () => {
   const handleDownload = async () => {
     setIsGeneratingPDF(true);
     try {
-      const response = await fetch("http://localhost:5000/api/resume-builder/generate-pdf", {
+      const response = await fetch(API_ENDPOINTS.RESUME_BUILDER.GENERATE_PDF, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/pdf"
+        },
+        mode: 'cors',
+        credentials: 'include',
         body: JSON.stringify(resumeData),
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
 
       const blob = await response.blob();
@@ -46,7 +53,11 @@ const ResumeBuilder: React.FC = () => {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error downloading PDF:", error);
-      alert("Failed to generate PDF. Please make sure the backend server is running and try again.");
+      if (error.message.includes('CORS')) {
+        alert("CORS error: The backend server needs to allow requests from this domain. Please check the server configuration.");
+      } else {
+        alert(`Failed to generate PDF: ${error.message}`);
+      }
     } finally {
       setIsGeneratingPDF(false);
     }

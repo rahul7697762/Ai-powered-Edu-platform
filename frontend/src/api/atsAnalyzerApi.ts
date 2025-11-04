@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { API_ENDPOINTS } from '../config/api';
 
 export interface AnalysisParams {
   resumeText: string;
@@ -33,7 +33,7 @@ export const uploadResume = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append('resume', file);
 
-    const response = await fetch(`${API_BASE_URL}/ats-analyzer/process-resume`, {
+    const response = await fetch(API_ENDPOINTS.ATS_ANALYZER.PROCESS_RESUME, {
       method: 'POST',
       body: formData,
     });
@@ -64,7 +64,7 @@ export const analyzeResume = async (
   maxTokens: number = 1024
 ): Promise<string> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/ats-analyzer/analyze-resume`, {
+    const response = await fetch(API_ENDPOINTS.ATS_ANALYZER.ANALYZE_RESUME, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -102,7 +102,7 @@ export const rephraseText = async (
   maxTokens: number = 1024
 ): Promise<string> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/ats-analyzer/rephrase-text`, {
+    const response = await fetch(API_ENDPOINTS.ATS_ANALYZER.REPHRASE_TEXT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -139,7 +139,7 @@ export const generateCoverLetter = async (
   maxTokens: number = 1024
 ): Promise<string> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/ats-analyzer/generate-cover-letter`, {
+    const response = await fetch(API_ENDPOINTS.ATS_ANALYZER.GENERATE_COVER_LETTER, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -176,7 +176,7 @@ export const generateInterviewQuestions = async (
   maxTokens: number = 1024
 ): Promise<string> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/ats-analyzer/generate-interview-questions`, {
+    const response = await fetch(API_ENDPOINTS.ATS_ANALYZER.GENERATE_INTERVIEW_QUESTIONS, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -208,7 +208,7 @@ export const generateInterviewQuestions = async (
 // Check API health
 export const checkApiHealth = async (): Promise<boolean> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/ats-analyzer/health`);
+    const response = await fetch(API_ENDPOINTS.ATS_ANALYZER.HEALTH);
     const data = await response.json();
     return data.status === 'healthy';
   } catch (error) {
