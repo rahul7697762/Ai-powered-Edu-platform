@@ -1,7 +1,7 @@
 // Page 3 — ResumePreview.tsx
 import React from "react";
-
-import { ResumeTemplate } from "../contexts";
+import BasicDownloadDropdown from "../components/BasicDownloadDropdown";
+import { ResumeTemplate, ResumeTone } from "../contexts";
 
 interface Props {
   fullName?: string;
@@ -12,6 +12,7 @@ interface Props {
   experience?: string;
   education?: string;
   skills?: string;
+  resumeTone?: ResumeTone;
   template: ResumeTemplate;
   onDownload: () => void;
   isGeneratingPDF?: boolean;
@@ -26,10 +27,25 @@ const ResumePreview: React.FC<Props> = ({
   experience = '',
   education = '',
   skills = '',
+  resumeTone = 'Professional',
   template,
   onDownload,
   isGeneratingPDF = false,
 }) => {
+  
+  // Create resume data object for DOC generation
+  const resumeData = {
+    fullName,
+    email,
+    phone,
+    address,
+    summary,
+    experience,
+    education,
+    skills,
+    resumeTone,
+    template
+  };
   // Helper function to format text with bullet points
   const formatTextWithBullets = (text: string | undefined | null) => {
     if (!text || typeof text !== 'string') return null;
@@ -139,7 +155,7 @@ const ResumePreview: React.FC<Props> = ({
       </h2>
 
       {/* Resume Card */}
-      <div className={`shadow-lg rounded-lg border border-slate-200 dark:border-slate-700 ${styles.container}`}>
+      <div id="resume-preview" className={`shadow-lg rounded-lg border border-slate-200 dark:border-slate-700 ${styles.container}`}>
         <div className={styles.content}>
           {/* Header Section */}
           <header className={`text-center ${styles.header}`}>
@@ -245,28 +261,16 @@ const ResumePreview: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Download Button */}
-      <button
-        onClick={onDownload}
-        disabled={isGeneratingPDF}
-        className={`mt-6 w-full py-3 rounded-lg transition ${
-          isGeneratingPDF
-            ? 'bg-gray-400 cursor-not-allowed'
-            : 'bg-indigo-600 hover:bg-indigo-700'
-        } text-white`}
-      >
-        {isGeneratingPDF ? (
-          <span className="flex items-center justify-center">
-            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Generating PDF...
-          </span>
-        ) : (
-          '📄 Download as PDF'
-        )}
-      </button>
+      {/* Download Dropdown */}
+      <div className="mt-6">
+        <BasicDownloadDropdown
+          onDownloadPDF={onDownload}
+          isGeneratingPDF={isGeneratingPDF}
+          resumeData={resumeData}
+          elementId="resume-preview"
+          filename={fullName ? fullName.toLowerCase().replace(/\s+/g, '_') : 'resume'}
+        />
+      </div>
     </div>
   );
 };

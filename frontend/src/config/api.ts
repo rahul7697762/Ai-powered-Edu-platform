@@ -21,6 +21,21 @@ export const API_ENDPOINTS = {
     GENERATE_INTERVIEW_QUESTIONS: `${API_BASE_URL}/api/ats-analyzer/generate-interview-questions`,
     REPHRASE_TEXT: `${API_BASE_URL}/api/ats-analyzer/rephrase-text`,
     HEALTH: `${API_BASE_URL}/api/ats-analyzer/health`,
+  },
+
+  // AI Suggestions
+  AI_SUGGESTIONS: {
+    GENERATE: `${API_BASE_URL}/api/ai-suggestions/generate-suggestions`,
+    HEALTH: `${API_BASE_URL}/api/ai-suggestions/health`,
+  },
+
+  // Database
+  DATABASE: {
+    HEALTH: `${API_BASE_URL}/api/database/health`,
+    USERS: `${API_BASE_URL}/api/database/users`,
+    RESUMES: `${API_BASE_URL}/api/database/resumes`,
+    ATS_RESULTS: `${API_BASE_URL}/api/database/ats-results`,
+    TEST_DATA: `${API_BASE_URL}/api/database/test-data`,
   }
 };
 

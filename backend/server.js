@@ -1,7 +1,15 @@
 import express from "express";
 import cors from "cors";
+import dotenv from "dotenv";
 import resumeBuilderRoutes from "./routes/resumeBuilderRoutes.js";
 import atsAnalyzerRoutes from "./routes/atsAnalyzerRoutes.js";
+import aiSuggestionsRoutes from "./routes/aiSuggestionsRoutes.js";
+import databaseRoutes from "./routes/databaseRoutes.js";
+import statusRoutes from "./routes/statusRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+
+// Load environment variables
+dotenv.config({ path: '.env.local' });
 
 const app = express();
 
@@ -59,8 +67,12 @@ app.get('/', (req, res) => {
   });
 });
 
+app.use("/api/auth", authRoutes);
 app.use("/api/resume-builder", resumeBuilderRoutes);
 app.use("/api/ats-analyzer", atsAnalyzerRoutes);
+app.use("/api/ai-suggestions", aiSuggestionsRoutes);
+app.use("/api/database", databaseRoutes);
+app.use("/api/status", statusRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

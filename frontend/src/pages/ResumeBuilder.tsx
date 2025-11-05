@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ResumeForm from "./ResumeForm";
 import ResumePreview from "./ResumePreview";
 import TemplateSelection from "./TemplateSelection";
+import AISuggestions from "../components/AISuggestions";
 import { useResume, ResumeData, ResumeTemplate } from "../contexts";
 import { API_ENDPOINTS } from "../config/api";
 
@@ -9,9 +10,16 @@ const ResumeBuilder: React.FC = () => {
   const { resumeData, setResumeData } = useResume();
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [showTemplateSelection, setShowTemplateSelection] = useState(true);
+  const [activeTab, setActiveTab] = useState<'form' | 'suggestions'>('form');
 
   const handleFieldChange = (field: keyof ResumeData, value: any) => {
     setResumeData((prev: ResumeData) => ({ ...prev, [field]: value }));
+  };
+
+  const handleApplySuggestion = (field: keyof ResumeData, value: string) => {
+    setResumeData((prev: ResumeData) => ({ ...prev, [field]: value }));
+    // Switch back to form tab to see the applied changes
+    setActiveTab('form');
   };
 
   const handleTemplateSelect = (template: ResumeTemplate) => {
@@ -92,20 +100,58 @@ const ResumeBuilder: React.FC = () => {
         </div>
       </div>
 
+      {/* Tab Navigation */}
+      <div className="max-w-6xl mx-auto px-6 mb-6">
+        <div className="flex space-x-1 bg-gray-100 dark:bg-slate-700 p-1 rounded-lg">
+          <button
+            onClick={() => setActiveTab('form')}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'form'
+                ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+            }`}
+          >
+            📝 Resume Form
+          </button>
+          <button
+            onClick={() => setActiveTab('suggestions')}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'suggestions'
+                ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+            }`}
+          >
+            🤖 AI Suggestions
+          </button>
+        </div>
+      </div>
+
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 p-6">
-        <ResumeForm
-          {...resumeData}
-          setFullName={(v) => handleFieldChange("fullName", v)}
-          setEmail={(v) => handleFieldChange("email", v)}
-          setPhone={(v) => handleFieldChange("phone", v)}
-          setAddress={(v) => handleFieldChange("address", v)}
-          setSummary={(v) => handleFieldChange("summary", v)}
-          setExperience={(v) => handleFieldChange("experience", v)}
-          setEducation={(v) => handleFieldChange("education", v)}
-          setSkills={(v) => handleFieldChange("skills", v)}
-          setResumeTone={(v) => handleFieldChange("resumeTone", v)}
-          setTemplate={(v) => handleFieldChange("template", v)}
-        />
+        {/* Left Panel - Form or Suggestions */}
+        <div>
+          {activeTab === 'form' ? (
+            <ResumeForm
+              {...resumeData}
+              setFullName={(v) => handleFieldChange("fullName", v)}
+              setEmail={(v) => handleFieldChange("email", v)}
+              setPhone={(v) => handleFieldChange("phone", v)}
+              setAddress={(v) => handleFieldChange("address", v)}
+              setSummary={(v) => handleFieldChange("summary", v)}
+              setExperience={(v) => handleFieldChange("experience", v)}
+              setEducation={(v) => handleFieldChange("education", v)}
+              setSkills={(v) => handleFieldChange("skills", v)}
+              setResumeTone={(v) => handleFieldChange("resumeTone", v)}
+              setTemplate={(v) => handleFieldChange("template", v)}
+            />
+          ) : (
+            <AISuggestions
+              resumeData={resumeData}
+              onApplySuggestion={handleApplySuggestion}
+            />
+          )}
+        </div>
+
+        {/* Right Panel - Preview */}
         <ResumePreview {...resumeData} onDownload={handleDownload} isGeneratingPDF={isGeneratingPDF} />
       </div>
     </div>

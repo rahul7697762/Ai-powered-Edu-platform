@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ThemeToggleButton from './ThemeToggleButton';
+import UserProfile from './auth/UserProfile';
+import { useAuth } from '../contexts/AuthContext';
 
-type Page = 'home' | 'resumeBuilder' | 'atsTools';
+type Page = 'home' | 'resumeBuilder' | 'professionalResume' | 'atsTools' | 'auth' | 'dashboard';
 
 const NavLink: React.FC<{ onClick: () => void; children: React.ReactNode }> = ({ onClick, children }) => (
   <button onClick={onClick} className="text-gray-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white transition-colors duration-200 px-3 py-2 rounded-md text-sm font-medium">
@@ -15,17 +17,63 @@ const MobileNavLink: React.FC<{ onClick: () => void; children: React.ReactNode }
     </button>
   );
 
+const DropdownNavLink: React.FC<{ children: React.ReactNode; isOpen: boolean; onToggle: () => void }> = ({ children, isOpen, onToggle }) => (
+  <div className="relative">
+    <button 
+      onClick={onToggle}
+      className="flex items-center text-gray-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white transition-colors duration-200 px-3 py-2 rounded-md text-sm font-medium"
+    >
+      {children}
+      <svg className={`ml-1 h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+  </div>
+);
+
+const DropdownItem: React.FC<{ onClick: () => void; children: React.ReactNode; description?: string }> = ({ onClick, children, description }) => (
+  <button
+    onClick={onClick}
+    className="w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
+  >
+    <div className="font-medium">{children}</div>
+    {description && <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{description}</div>}
+  </button>
+);
+
 interface HeaderProps {
     navigateTo: (page: Page) => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ navigateTo }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [resumeDropdownOpen, setResumeDropdownOpen] = useState(false);
+    const { isAuthenticated } = useAuth();
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     const handleMobileNavClick = (page: Page) => {
         navigateTo(page);
         setIsOpen(false);
     }
+
+    const handleResumeBuilderClick = (page: Page) => {
+        navigateTo(page);
+        setResumeDropdownOpen(false);
+    }
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setResumeDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
   return (
     <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800">
@@ -36,15 +84,55 @@ const Header: React.FC<HeaderProps> = ({ navigateTo }) => {
           </div>
           <div className="hidden md:block">
             <div className="ml-10 flex items-center space-x-1">
-              <NavLink onClick={() => navigateTo('home')}>Home</NavLink>    
-              <NavLink onClick={() => navigateTo('resumeBuilder')}>Resume Builder</NavLink>
+              <NavLink onClick={() => navigateTo('home')}>Home</NavLink>
+              {isAuthenticated && <NavLink onClick={() => navigateTo('dashboard')}>Dashboard</NavLink>}
+              
+              {/* Resume Builder Dropdown */}
+              <div className="relative" ref={dropdownRef}>
+                <DropdownNavLink 
+                  isOpen={resumeDropdownOpen} 
+                  onToggle={() => setResumeDropdownOpen(!resumeDropdownOpen)}
+                >
+                  Resume Builder
+                </DropdownNavLink>
+                
+                {resumeDropdownOpen && (
+                  <div className="absolute left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+                    <div className="py-1">
+                      <DropdownItem 
+                        onClick={() => handleResumeBuilderClick('resumeBuilder')}
+                        description="Simple resume builder with basic templates"
+                      >
+                        Basic Resume Builder
+                      </DropdownItem>
+                      <DropdownItem 
+                        onClick={() => handleResumeBuilderClick('professionalResume')}
+                        description="Advanced professional template with detailed sections"
+                      >
+                        Professional Resume
+                      </DropdownItem>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
               <NavLink onClick={() => navigateTo('atsTools')}>ATS Tools</NavLink>
               <NavLink onClick={() => {}}>Placement Prep</NavLink>
               <NavLink onClick={() => {}}>Code IDE</NavLink>
               <NavLink onClick={() => {}}>Games</NavLink>
               <NavLink onClick={() => {}}>Mock Interview</NavLink>
-              <div className="ml-4">
+              <div className="ml-4 flex items-center space-x-3">
                 <ThemeToggleButton />
+                {isAuthenticated ? (
+                  <UserProfile />
+                ) : (
+                  <button
+                    onClick={() => navigateTo('auth')}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors duration-200"
+                  >
+                    Login
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -76,7 +164,17 @@ const Header: React.FC<HeaderProps> = ({ navigateTo }) => {
         <div className="md:hidden" id="mobile-menu">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <MobileNavLink onClick={() => handleMobileNavClick('home')}>Home</MobileNavLink>
-            <MobileNavLink onClick={() => handleMobileNavClick('resumeBuilder')}>Resume Builder</MobileNavLink>
+            {isAuthenticated && <MobileNavLink onClick={() => handleMobileNavClick('dashboard')}>Dashboard</MobileNavLink>}
+            
+            {/* Resume Builder Section */}
+            <div className="px-3 py-2">
+              <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Resume Builder</div>
+            </div>
+            <div className="ml-4 space-y-1">
+              <MobileNavLink onClick={() => handleMobileNavClick('resumeBuilder')}>Basic Resume Builder</MobileNavLink>
+              <MobileNavLink onClick={() => handleMobileNavClick('professionalResume')}>Professional Resume</MobileNavLink>
+            </div>
+            
             <MobileNavLink onClick={() => handleMobileNavClick('atsTools')}>ATS Tools</MobileNavLink>
             <MobileNavLink onClick={() => {}}>Placement Prep</MobileNavLink>
             <MobileNavLink onClick={() => {}}>Code IDE</MobileNavLink>

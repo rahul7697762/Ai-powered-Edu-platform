@@ -4,8 +4,7 @@ import { Client } from "@gradio/client";
 import { ResumeTemplate } from "../contexts";
 
 interface Props {
-  resumeTone: string;
-  setResumeTone: (tone: "Professional" | "Technical" | "Creative") => void;
+ 
   template: ResumeTemplate;
   setTemplate: (template: ResumeTemplate) => void;
   fullName: string;
@@ -27,8 +26,7 @@ interface Props {
 }
 
 const ResumeForm: React.FC<Props> = ({
-  resumeTone,
-  setResumeTone,
+ 
   template,
   setTemplate,
   fullName,
@@ -84,22 +82,7 @@ const ResumeForm: React.FC<Props> = ({
       <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Your Information</h2>
 
       {/* Tone Selection */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        {["Professional", "Technical", "Creative"].map((tone) => (
-          <button
-            key={tone}
-            type="button"
-            onClick={() => setResumeTone(tone as any)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              resumeTone === tone
-                ? "bg-indigo-600 text-white shadow"
-                : "bg-gray-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-gray-200"
-            }`}
-          >
-            {tone}
-          </button>
-        ))}
-      </div>
+      
 
       {/* Personal Info */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">

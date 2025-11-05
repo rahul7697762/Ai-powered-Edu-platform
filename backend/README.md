@@ -6,9 +6,13 @@ This is the backend API for the AI-Powered Education Platform, providing resume 
 
 - **Resume Builder API**: Generate professional PDF resumes with multiple templates
 - **ATS Analyzer API**: Analyze resumes against job descriptions using AI
+- **AI Suggestions API**: Get AI-powered suggestions for resume improvement
+- **Database Integration**: Full Supabase PostgreSQL database with user management
 - **Multiple Templates**: Support for 10+ professional resume templates
 - **PDF Generation**: High-quality PDF output with proper formatting
 - **Bullet Point Support**: Automatic formatting of bullet points in resumes
+- **Keyword Optimization**: AI-driven keyword recommendations for better ATS compatibility
+- **Data Persistence**: Store resumes, ATS results, and user profiles
 
 ## Tech Stack
 
@@ -16,6 +20,10 @@ This is the backend API for the AI-Powered Education Platform, providing resume 
 - **PDFKit** for PDF generation
 - **Multer** for file uploads
 - **@gradio/client** for AI integration
+- **@google/generative-ai** for Google Gemini AI integration
+- **@supabase/supabase-js** for database operations
+- **PostgreSQL** with Supabase for data storage
+- **bcrypt** for password hashing
 - **CORS** enabled for cross-origin requests
 
 ## Local Development
@@ -50,6 +58,19 @@ The server will run on `http://localhost:5000`
 - `POST /api/ats-analyzer/generate-interview-questions` - Generate interview questions
 - `POST /api/ats-analyzer/rephrase-text` - Rephrase text content
 - `GET /api/ats-analyzer/health` - Health check
+
+### AI Suggestions
+- `POST /api/ai-suggestions/generate-suggestions` - Generate AI-powered resume improvement suggestions
+- `GET /api/ai-suggestions/health` - Health check
+
+### Database
+- `GET /api/database/health` - Database connection health check
+- `POST /api/database/users` - Create user account
+- `GET /api/database/users/:id` - Get user profile
+- `POST /api/database/resumes` - Save resume to database
+- `GET /api/database/users/:userId/resumes` - Get user's resumes
+- `POST /api/database/ats-results` - Save ATS analysis results
+- `GET /api/database/users/:userId/ats-results/stats` - Get ATS statistics
 
 ## Deployment on Vercel
 
@@ -106,6 +127,11 @@ const API_BASE_URL = 'https://ai-edu-platform-backend.vercel.app';
 - `NODE_ENV`: Set to 'production' for production deployment
 - `PORT`: Port number (automatically set by Vercel)
 - `ALLOWED_ORIGINS`: Comma-separated list of allowed frontend domains
+- `GOOGLE_AI_API_KEY`: Google Gemini AI API key for AI suggestions feature
+- `SUPABASE_URL`: Supabase project URL
+- `SUPABASE_ANON_KEY`: Supabase anonymous key
+- `SUPABASE_SERVICE_ROLE_KEY`: Supabase service role key for admin operations
+- `POSTGRES_URL`: PostgreSQL connection string
 
 ## File Structure
 
@@ -113,14 +139,49 @@ const API_BASE_URL = 'https://ai-edu-platform-backend.vercel.app';
 backend/
 ├── routes/
 │   ├── resumeBuilderRoutes.js
-│   └── atsAnalyzerRoutes.js
+│   ├── atsAnalyzerRoutes.js
+│   ├── aiSuggestionsRoutes.js
+│   └── databaseRoutes.js
+├── services/
+│   ├── userService.js
+│   ├── resumeService.js
+│   └── atsService.js
+├── config/
+│   └── database.js
+├── database/
+│   └── schema.sql
+├── scripts/
+│   └── initDatabase.js
 ├── server.js
 ├── package.json
 ├── vercel.json
 ├── .env.example
 ├── .gitignore
-└── README.md
+├── README.md
+└── DATABASE_SETUP.md
 ```
+
+## Database Setup
+
+The application uses Supabase PostgreSQL for data storage. To set up the database:
+
+1. **Manual Setup (Required)**:
+   - Go to [Supabase SQL Editor](https://supabase.com/dashboard/project/hrlncrvcwhvymwsfmyxi/sql)
+   - Copy and paste the contents of `backend/database/schema.sql`
+   - Execute the SQL script to create all tables and relationships
+
+2. **Test Connection**:
+   ```bash
+   npm run db:init-manual
+   curl http://localhost:5000/api/database/health
+   ```
+
+3. **Create Test Data**:
+   ```bash
+   curl -X POST http://localhost:5000/api/database/test-data
+   ```
+
+For detailed setup instructions, see `DATABASE_SETUP.md`.
 
 ## Support
 
